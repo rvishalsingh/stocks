@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>About Us — Analytics</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-MSTS0Z0JPP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-MSTS0Z0JPP');
+</script>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <a class="brand" href="index.html">Analytics</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="products.html">Products</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="content card">
+      <h1>About Us</h1>
+      <p class="muted">We are a small team focused on delivering straightforward trading products and education. Our mission is to help traders and investors make informed decisions using evidence-based strategies.</p>
+
+      <h2>Our approach</h2>
+      <p class="muted">We emphasize risk management, clear entry/exit rules, and portfolio-level thinking. Our products are designed for traders of different timeframes: swing, derivatives (F&amp;O), and long-term portfolios.</p>
+
+      <h3>Contact</h3>
+      <p class="muted">For inquiries, you can open Telegram or WhatsApp from our pages (mobile) or use the contact options on the product pages.</p>
+    </section>
+
+    <footer class="footer">
+      © <span id="year"></span> Analytics
+    </footer>
+  </main>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

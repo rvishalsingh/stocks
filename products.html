@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Products — Analytics</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <a class="brand" href="index.html">Analytics</a>
+      <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="products.html">Products</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="content">
+      <h1>Our Products</h1>
+      <p class="muted">Choose a product to learn more about the service and how it can fit your trading style.</p>
+
+      <div class="products-grid">
+        <article class="product">
+          <h3>Swing Trading</h3>
+          <p class="muted">Medium-term trades capturing multi-day to multi-week moves. Includes trade ideas, stop-loss and profit targets, and technical setups.</p>
+          <p><a class="btn" href="#" onclick="openShare('Swing Trading')">Contact about Swing</a></p>
+        </article>
+
+        <article class="product">
+          <h3>F&amp;O Trading</h3>
+          <p class="muted">Options and Futures strategies for directional and hedged trades. Risk-first sizing and trade templates included.</p>
+          <p><a class="btn" href="#" onclick="openShare('F&O Trading')">Contact about F&amp;O</a></p>
+        </article>
+
+        <article class="product">
+          <h3>Portfolio Stocks</h3>
+          <p class="muted">Long-term stock picks and portfolio construction advice, focused on diversification, earnings quality, and long-term growth.</p>
+          <p><a class="btn" href="#" onclick="openShare('Portfolio Stocks')">Contact about Portfolio</a></p>
+        </article>
+      </div>
+
+    </section>
+
+    <footer class="footer">© <span id="year"></span> Analytics</footer>
+  </main>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Opens Telegram share first (mobile), falls back to t.me web share
+    function openShare(product){
+      const msg = encodeURIComponent(`Hi, I'm interested in your ${product} product. Please tell me more.`);
+      const tgApp = `tg://msg?text=${msg}`;
+      const tgShare = `https://t.me/share/url?url=&text=${msg}`;
+      // Try tg:// then fallback to web share
+      const opened = window.open(tgApp, '_blank');
+      setTimeout(()=> window.open(tgShare, '_blank'), 600);
+    }
+  </script>
+</body>
+</html>
