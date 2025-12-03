@@ -1,0 +1,396 @@
+<!--
+Single-file responsive website (HTML + CSS + Bootstrap)
+Instructions:
+ 1) Replace the image path if needed. Current path: /mnt/data/Annosment.jpg
+ 2) Replace YOUTUBE_VIDEO_ID in the embed iframe src with your video's ID (example: https://www.youtube.com/watch?v=XXXXXXXX -> use XXXXXXXXX)
+ 3) Replace https://flow.assetplus.in/client_onboarding/?advisor=676e37c8a2e28bfbfb7dd79d and https://invite.dhan.co/?join=KUPA138 with your actual referral URLs
+ 4) Edit the targetDate variable in the <script> (format: 'YYYY-MM-DDTHH:MM:SS') to hard-code your webinar start time.
+
+This file includes:
+ - Light/Dark theme toggle (persisted to localStorage)
+ - Announcement banner using your image
+ - Countdown timer (hard-code date/time)
+ - YouTube video embed section
+ - Investment & Trading section with two referral buttons
+ - "Which stocks to buy tomorrow" section
+ - About / Details section
+ - Footer
+-->
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Announcement — Webinar</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root{
+      --bg-light:#ffffff;
+      --text-light:#04243a; /* deep blue */
+      --accent-blue:#0d6efd; /* bootstrap primary */
+      --accent-green:#20c997; /* neon-ish green */
+
+      --bg-dark:#0f1720; /* charcoal */
+      --text-dark:#e6fff6; /* light */
+      --accent-blue-dark:#3dd5ff; /* aqua-blue */
+      --accent-green-dark:#39ff8a; /* neon-green */
+    }
+
+    /* Page layout */
+    body.light{
+      background:var(--bg-light);
+      color:var(--text-light);
+    }
+    body.dark{
+      background:var(--bg-dark);
+      color:var(--text-dark);
+    }
+
+    /* Header / banner */
+    .hero{
+      background-size:cover;
+      background-position:center;
+      min-height:60vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+    }
+    .hero-overlay{
+      position:absolute;inset:0;
+      background:linear-gradient(180deg, rgba(2,6,23,0.35), rgba(2,6,23,0.35));
+    }
+    body.light .hero-overlay{ background:linear-gradient(180deg, rgba(255,255,255,0.2), rgba(255,255,255,0.2)); }
+    .hero-content{ position:relative; z-index:2; text-align:center; }
+
+    .badge-accent{
+      background: linear-gradient(90deg,var(--accent-blue),var(--accent-green));
+      color:white;
+      font-weight:600;
+    }
+
+    /* Timer styles */
+    .countdown .unit{ min-width:80px; }
+
+    /* Two referral buttons */
+    .ref-buttons .btn{
+      min-width:160px;
+      font-weight:600;
+      border-radius:12px;
+      box-shadow:0 6px 18px rgba(3,9,20,0.08);
+    }
+
+    /* Stocks list */
+    .stock-card{ border-radius:12px; }
+
+    /* Footer */
+    footer{ padding:2.2rem 0; }
+
+    /* Theme-specific accents */
+    body.light .accent-btn{ background: linear-gradient(90deg,var(--accent-blue),var(--accent-green)); color:#fff; }
+    body.dark .accent-btn{ background: linear-gradient(90deg,var(--accent-blue-dark),var(--accent-green-dark)); color:#091217; }
+
+    /* Responsive small tweaks */
+    @media (max-width:576px){
+      .hero{ min-height:48vh; }
+      .countdown .unit{ min-width:64px; font-size:14px; }
+    }
+  </style>
+</head>
+<body class="light">
+
+<nav class="navbar navbar-expand-lg sticky-top shadow-sm py-3">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="#">
+      <div style="width:44px;height:44px;background:linear-gradient(90deg,#0d6efd,#20c997);border-radius:10px"></div>
+      <div class="fw-bold">Webinar Announcement</div>
+    </a>
+
+    <div class="d-flex align-items-center ms-auto">
+      <div class="me-3 text-muted small d-none d-lg-block">Blue & Green Theme — Light / Dark</div>
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="themeToggle">
+        <label class="form-check-label small" for="themeToggle">Dark</label>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero/announcement section removed -->
+
+<!-- Section 2: Timer -->
+<section class="py-5">
+  <div class="container text-center">
+    <h2 class="mb-3">Webinar Countdown</h2>
+    <p class="text-muted mb-4">Set the date/time in the code to change this timer.</p>
+    <div class="d-flex justify-content-center gap-3 countdown">
+      <div class="unit card p-3 text-center">
+        <div id="days" class="fs-3 fw-bold">00</div>
+        <div class="small text-muted">Days</div>
+      </div>
+      <div class="unit card p-3 text-center">
+        <div id="hours" class="fs-3 fw-bold">00</div>
+        <div class="small text-muted">Hours</div>
+      </div>
+      <div class="unit card p-3 text-center">
+        <div id="minutes" class="fs-3 fw-bold">00</div>
+        <div class="small text-muted">Minutes</div>
+      </div>
+      <div class="unit card p-3 text-center">
+        <div id="seconds" class="fs-3 fw-bold">00</div>
+        <div class="small text-muted">Seconds</div>
+      </div>
+    </div>
+    <div class="mt-4">
+      <small class="text-muted">Webinar will start at: <span id="targetReadable">--</span></small>
+    </div>
+  </div>
+</section>
+
+<!-- Section 3: Video -->
+<section class="py-5 bg-light bg-gradient" id="videoSection">
+  <div class="container">
+    <h2 class="mb-3">Watch the Preview</h2>
+    <p class="text-muted mb-4">This is your YouTube video embed — replace YOUTUBE_VIDEO_ID in the code.</p>
+    <div class="ratio ratio-16x9 shadow-sm rounded">
+      <!-- Replace YOUTUBE_VIDEO_ID below with your video id -->
+      <iframe id="ytPlayer" src="https://www.youtube.com/embed/RwLk3D-rLLA" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style="border-radius:12px"></iframe>
+      <div class="mt-2"><a href="https://www.youtube.com/watch?v=RwLk3D-rLLA" target="_blank" rel="noopener">Watch on YouTube</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- Section 4: Investment & Trading (two buttons) -->
+<section class="py-5" id="referral">
+  <div class="container">
+    <h2 class="mb-3">Investment & Trading</h2>
+    <p class="text-muted">Open the platforms using the links below.</p>
+    <div class="d-flex flex-column flex-sm-row gap-3 ref-buttons">
+      <!-- Replace ASSETPLUS_REFERRAL_LINK and DHAN_REFERRAL_LINK -->
+      <a href="ASSETPLUS_REFERRAL_LINK" target="_blank" class="btn accent-btn btn-lg">AssetPlus (Invest)</a>
+      <a href="DHAN_REFERRAL_LINK" target="_blank" class="btn accent-btn btn-lg">Dhan (Trading)</a>
+    </div>
+    <div class="mt-4 small text-muted">Tip: Right-click and open in new tab to preserve this page.</div>
+  </div>
+</section>
+
+<!-- Section 5: Which stocks to buy tomorrow -->
+<section class="py-5 bg-gradient" id="stocks">
+  <div class="container">
+    <h2 class="mb-3">Which Stocks to Buy Tomorrow</h2>
+    <p class="text-muted">Quick watchlist and notes for next trading day.</p>
+    <div class="row g-3">
+      <!-- Example card; update content dynamically if needed -->
+      <div class="col-md-4">
+        <div class="card stock-card p-3">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <h5 class="mb-1">SBIN</h5>
+              <div class="small text-muted">Buy Range: ₹780 - ₹820</div>
+            </div>
+            <div class="badge bg-success">Bank</div>
+          </div>
+          <p class="mt-2 small">Look for support near 780. RSI turning bullish could make a reversal trade.</p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card stock-card p-3">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <h5 class="mb-1">RELIANCE</h5>
+              <div class="small text-muted">Buy Range: ₹2600 - ₹2680</div>
+            </div>
+            <div class="badge bg-primary">Energy</div>
+          </div>
+          <p class="mt-2 small">Watch volume on breakout above 2680 for momentum entries.</p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card stock-card p-3">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <h5 class="mb-1">TCS</h5>
+              <div class="small text-muted">Buy Range: ₹3200 - ₹3300</div>
+            </div>
+            <div class="badge bg-info text-dark">IT</div>
+          </div>
+          <p class="mt-2 small">Prefer buying on dips with confirmed support and positive news flow.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Section 6: About / Details -->
+<section class="py-5" id="about">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <h2>About This Webinar</h2>
+        <p class="text-muted">Join industry experts as they discuss market strategies, risk management, and live Q&amp;A. Perfect for
+        both new and experienced traders who want actionable insights.</p>
+        <ul class="text-muted">
+          <li>Live analysis of major indices</li>
+          <li>Commodity and currency outlook</li>
+          <li>Q&amp;A with experts</li>
+        </ul>
+      </div>
+      <div class="col-lg-6">
+        <div class="card p-3 shadow-sm">
+          <h5>Event Details</h5>
+          <p class="mb-1"><strong>Host:</strong> Market Education</p>
+          <p class="mb-1"><strong>Duration:</strong> 90 minutes</p>
+          <p class="mb-0"><strong>Format:</strong> Presentation + Live Q&amp;A</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Section 7: Footer -->
+<!-- Improved footer -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="row gy-4">
+      <div class="col-md-4">
+        <div class="footer-logo">
+          <div class="mark"></div>
+          <div>
+            <div class="fw-bold">Orchid Research</div>
+            <div class="small text-muted">Educational Market Research</div>
+          </div>
+        </div>
+        <p class="mt-3">Practical webinars, market screeners and easy-to-follow trading insights. Join our community to learn actionable strategies.</p>
+      </div>
+
+      <div class="col-md-4">
+        <h5>Quick Links</h5>
+        <div class="footer-links mt-3">
+          <a href="https://www.youtube.com/@OrchidResearch" target="_blank" rel="noopener">YouTube</a>
+          <a href="https://t.me/orchid_research" target="_blank" rel="noopener">Telegram</a>
+          <a href="https://x.com/orchid_research" target="_blank" rel="noopener">Twitter (X)</a>
+          <a href="https://www.orchidresearch.in/which-stocks-to-buy-tomorrow" target="_blank" rel="noopener">Momentum Stocks</a>
+          <a href="mailto:hello@orchidresearch.in">Contact Us</a>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <h5>Stay Updated</h5>
+        <div class="newsletter mt-3">
+          <input type="email" id="subscribeEmail" placeholder="Your email" aria-label="Email for newsletter">
+          <button id="subscribeBtn">Subscribe</button>
+        </div>
+        <div class="social-icons mt-3">
+          <a href="https://t.me/orchid_research" target="_blank" rel="noopener" aria-label="Telegram">TG</a>
+          <a href="https://x.com/orchid_research" target="_blank" rel="noopener" aria-label="Twitter">X</a>
+          <a href="https://www.instagram.com/orchidresearchofficial" target="_blank" rel="noopener" aria-label="Instagram">IG</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mt-4 small">© <span id="year"></span> Orchid Research — Educational Market Research &amp; Learning</div>
+  </div>
+</footer>
+
+<style>
+  /* Footer styles */
+  .site-footer{ background: linear-gradient(90deg,#071123,#0f1720); color:#cbd5e1; padding:3rem 0; border-top:1px solid rgba(255,255,255,0.04); }
+  .site-footer .footer-logo{ display:flex; align-items:center; gap:12px; color:#fff; }
+  .site-footer .mark{ width:44px; height:44px; background:linear-gradient(90deg,#0d6efd,#20c997); border-radius:10px; }
+  .site-footer p{ color:#9ca3af; margin:0; }
+  .site-footer h5{ color:#e6f0fb; }
+  .site-footer .footer-links a{ display:block; color:#93c5fd; text-decoration:none; margin-bottom:8px; }
+  .site-footer .footer-links a:hover{ color:#fff; }
+  .site-footer .social-icons a{ display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:8px; background:rgba(255,255,255,0.03); color:#fff; margin-right:8px; text-decoration:none; font-weight:700; }
+  .site-footer .newsletter input{ padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.06); background:transparent; color:inherit; width:100%; margin-bottom:8px; }
+  .site-footer .newsletter button{ padding:10px 14px; border-radius:8px; border:none; background:linear-gradient(90deg,#0d6efd,#20c997); color:#071217; font-weight:700; cursor:pointer; }
+  @media (max-width:576px){ .site-footer .footer-links a{ display:inline-block; margin-right:10px; } }
+</style>
+
+<!-- Bootstrap JS bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  // ---------------------------
+  // THEME TOGGLE
+  // ---------------------------
+  const rootBody = document.body;
+  const toggle = document.getElementById('themeToggle');
+
+  function applyTheme(theme){
+    if(theme === 'dark'){
+      rootBody.classList.remove('light');
+      rootBody.classList.add('dark');
+      toggle.checked = true;
+    } else {
+      rootBody.classList.remove('dark');
+      rootBody.classList.add('light');
+      toggle.checked = false;
+    }
+  }
+
+  // initialize theme from localStorage
+  const savedTheme = localStorage.getItem('site-theme') || 'light';
+  applyTheme(savedTheme);
+
+  toggle.addEventListener('change', ()=>{
+    const newTheme = toggle.checked ? 'dark' : 'light';
+    applyTheme(newTheme);
+    localStorage.setItem('site-theme', newTheme);
+  });
+
+  // ---------------------------
+  // COUNTDOWN TIMER
+  // ---------------------------
+  // Edit this targetDate to hard-code your webinar start date/time
+  // Format: 'YYYY-MM-DDTHH:MM:SS' in local time. Example: '2025-12-10T10:00:00'
+  const targetDate = new Date('2025-12-10T10:00:00'); // <-- CHANGE THIS
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+  function updateCountdown(){
+    const now = new Date();
+    const diff = targetDate - now;
+    if(diff <= 0){
+      document.getElementById('days').textContent = '00';
+      document.getElementById('hours').textContent = '00';
+      document.getElementById('minutes').textContent = '00';
+      document.getElementById('seconds').textContent = '00';
+      return;
+    }
+    const days = Math.floor(diff / (1000*60*60*24));
+    const hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+    const minutes = Math.floor((diff % (1000*60*60)) / (1000*60));
+    const seconds = Math.floor((diff % (1000*60)) / 1000);
+    document.getElementById('days').textContent = pad(days);
+    document.getElementById('hours').textContent = pad(hours);
+    document.getElementById('minutes').textContent = pad(minutes);
+    document.getElementById('seconds').textContent = pad(seconds);
+  }
+  setInterval(updateCountdown, 1000);
+  updateCountdown();
+  document.getElementById('targetReadable').textContent = targetDate.toLocaleString();
+
+  // ---------------------------
+  // Year in footer
+  // ---------------------------
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // ---------------------------
+  // Quick helper: Replace placeholders on page load (if you want to programmatically set)
+  // ---------------------------
+  (function replacePlaceholders(){
+    // If you want to set referral links from JS, uncomment and set below
+    // document.querySelector('a[href="ASSETPLUS_REFERRAL_LINK"]').href = 'https://your-assetplus-referral-link.com';
+    // document.querySelector('a[href="DHAN_REFERRAL_LINK"]').href = 'https://your-dhan-referral-link.com';
+
+    // If you want to set YouTube video by URL string, you could parse and update iframe src here.
+  })();
+</script>
+
+</body>
+</html>
