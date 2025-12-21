@@ -6,74 +6,19 @@
   <title>Mutual Fund Calculator | Presented by Vishal Singh</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      background: #f4f6f8;
-      color: #222;
-    }
-    header {
-      background: #0d6efd;
-      color: #fff;
-      padding: 15px;
-      text-align: center;
-    }
-    .container {
-      max-width: 900px;
-      margin: auto;
-      padding: 20px;
-    }
-    .card {
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
-    }
-    label {
-      font-weight: bold;
-      display: block;
-      margin-top: 10px;
-    }
-    select, input, button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 16px;
-    }
-    button {
-      background: #0d6efd;
-      color: white;
-      border: none;
-      cursor: pointer;
-      margin-top: 15px;
-    }
-    button:hover {
-      background: #084298;
-    }
-    .results {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-      margin-top: 20px;
-    }
-    .result-box {
-      background: #f1f5ff;
-      padding: 15px;
-      border-radius: 8px;
-      text-align: center;
-    }
-    canvas {
-      margin-top: 20px;
-    }
-    footer {
-      text-align: center;
-      font-size: 14px;
-      padding: 10px;
-      color: #666;
-    }
+    body { font-family: Arial, sans-serif; margin: 0; background: #f4f6f8; color: #222; }
+    header { background: #0d6efd; color: #fff; padding: 15px; text-align: center; }
+    .container { max-width: 900px; margin: auto; padding: 20px; }
+    .card { background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    .calc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+    .calc-card { border: 1px solid #e0e0e0; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: 0.3s; background: #fafafa; }
+    .calc-card.active, .calc-card:hover { border-color: #0d6efd; box-shadow: 0 4px 12px rgba(13,110,253,0.2); }
+    label { font-weight: bold; display: block; margin-top: 10px; }
+    input, button { width: 100%; padding: 10px; margin-top: 5px; border-radius: 6px; border: 1px solid #ccc; font-size: 16px; }
+    button { background: #0d6efd; color: white; border: none; cursor: pointer; margin-top: 15px; }
+    .results { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
+    .result-box { background: #f1f5ff; padding: 15px; border-radius: 8px; text-align: center; }
+    footer { text-align: center; font-size: 14px; padding: 10px; color: #666; }
   </style>
 </head>
 <body>
@@ -86,13 +31,13 @@
 <div class="container">
 
   <div class="card">
-    <label>Choose Calculator</label>
-    <select id="type" onchange="changeType()">
-      <option value="sip">SIP</option>
-      <option value="lumpsum">Lumpsum</option>
-      <option value="swp">SWP</option>
-      <option value="liquid">Liquid Fund</option>
-    </select>
+    <h3 style="text-align:center;">Calculators</h3>
+    <div class="calc-grid">
+      <div class="calc-card active" data-type="sip" onclick="selectCalc('sip')">📈<h4>SIP</h4></div>
+      <div class="calc-card" data-type="swp" onclick="selectCalc('swp')">💸<h4>SWP</h4></div>
+      <div class="calc-card" data-type="lumpsum" onclick="selectCalc('lumpsum')">💰<h4>Lumpsum</h4></div>
+      <div class="calc-card" data-type="liquid" onclick="selectCalc('liquid')">🏦<h4>Liquid Fund</h4></div>
+    </div>
 
     <label id="amountLabel">Investment Amount (₹)</label>
     <input type="number" id="amount" value="500000" />
@@ -105,7 +50,7 @@
     <label id="durationLabel">Duration (Years)</label>
     <input type="number" id="duration" value="10" />
 
-    <label>Expected Return (% per annum)</label>
+    <label>Expected Return (% p.a.)</label>
     <input type="number" id="rate" value="12" />
 
     <button onclick="calculate()">Calculate</button>
@@ -114,154 +59,105 @@
   <div class="card">
     <div id="swpAlert" style="display:none;background:#ffe6e6;color:#b30000;padding:10px;border-radius:8px;margin-bottom:15px;text-align:center;font-weight:bold;"></div>
     <div class="results">
-      <div class="result-box">
-        <h4>Total Invested</h4>
-        <p id="invested">₹0</p>
-      </div>
-      <div class="result-box">
-        <h4>Total Withdrawal/Gain</h4>
-        <p id="gain">₹0</p>
-      </div>
-      <div class="result-box">
-        <h4>Final Portfolio Value</h4>
-        <p id="final">₹0</p>
-      </div>
+      <div class="result-box"><h4>Total Invested</h4><p id="invested">₹0</p></div>
+      <div class="result-box"><h4>Total Withdrawal / Gain</h4><p id="gain">₹0</p></div>
+      <div class="result-box"><h4>Final Portfolio Value</h4><p id="final">₹0</p></div>
     </div>
     <canvas id="chart"></canvas>
   </div>
 
 </div>
 
-<footer>
-  Mutual fund investments are subject to market risks. Returns are not guaranteed.
-</footer>
+<footer>Mutual fund investments are subject to market risks. Returns are not guaranteed.</footer>
 
 <script>
+  let selectedType = 'sip';
   let chart;
 
-  function changeType() {
-    const type = document.getElementById('type').value;
-    const label = document.getElementById('durationLabel');
-    const swpBox = document.getElementById('swpWithdrawal');
-    const amountLabel = document.getElementById('amountLabel');
+  function selectCalc(type) {
+    selectedType = type;
+    document.querySelectorAll('.calc-card').forEach(c => c.classList.remove('active'));
+    document.querySelector(`.calc-card[data-type="${type}"]`).classList.add('active');
 
-    if (type === 'liquid') {
-      label.innerText = 'Duration (Days)';
-      swpBox.style.display = 'none';
-      amountLabel.innerText = 'Investment Amount (₹)';
-    } else if (type === 'swp') {
-      const months = duration * 12;
-      invested = amount;
-      const r = rate / 12;
-      const withdrawal = parseFloat(document.getElementById('withdrawal').value);
-      let balance = amount;
-      totalWithdrawn = 0;
-      let exhaustedMonth = null;
-      let balances = [];
-
-      for (let i = 1; i <= months; i++) {
-        balance = balance * (1 + r) - withdrawal;
-        if (balance <= 0) {
-          exhaustedMonth = i;
-          totalWithdrawn += Math.max(0, withdrawal + balance);
-          balance = 0;
-          balances.push(0);
-          break;
-        }
-        totalWithdrawn += withdrawal;
-        balances.push(balance);
-      }
-
-      finalValue = balance;
-      document.getElementById('invested').innerText = '₹' + invested.toFixed(0);
-      document.getElementById('gain').innerText = '₹' + totalWithdrawn.toFixed(0);
-      document.getElementById('final').innerText = '₹' + finalValue.toFixed(0);
-
-      const alertBox = document.getElementById('swpAlert');
-      if (exhaustedMonth) {
-        const years = (exhaustedMonth / 12).toFixed(1);
-        alertBox.style.display = 'block';
-        alertBox.innerText = '⚠️ Portfolio exhausted in ' + years + ' years';
-      } else {
-        alertBox.style.displ
-    }
-  }
+    document.getElementById('swpWithdrawal').style.display = type === 'swp' ? 'block' : 'none';
+    document.getElementById('durationLabel').innerText = type === 'liquid' ? 'Duration (Days)' : 'Duration (Years)';
+    document.getElementById('amountLabel').innerText = type === 'swp' ? 'Total Investment (₹)' : 'Investment Amount (₹)';
   }
 
   function calculate() {
-    const type = document.getElementById('type').value;
     const amount = parseFloat(document.getElementById('amount').value);
     const duration = parseFloat(document.getElementById('duration').value);
     const rate = parseFloat(document.getElementById('rate').value) / 100;
 
-    let invested = 0, finalValue = 0, totalWithdrawn = 0;
+    let invested = 0, finalValue = 0, gain = 0;
 
-    if (type === 'sip') {
-      const months = duration * 12;
-      invested = amount * months;
+    if (selectedType === 'sip') {
+      const m = duration * 12;
       const r = rate / 12;
-      finalValue = amount * ((Math.pow(1 + r, months) - 1) / r) * (1 + r);
+      invested = amount * m;
+      finalValue = amount * ((Math.pow(1 + r, m) - 1) / r) * (1 + r);
+      gain = finalValue - invested;
     }
 
-    if (type === 'lumpsum') {
+    if (selectedType === 'lumpsum') {
       invested = amount;
       finalValue = amount * Math.pow(1 + rate, duration);
+      gain = finalValue - invested;
     }
 
-    if (type === 'swp') {
-      const months = duration * 12;
-      invested = amount;
+    if (selectedType === 'swp') {
+      const m = duration * 12;
       const r = rate / 12;
+      const w = parseFloat(document.getElementById('withdrawal').value);
       let balance = amount;
-      let withdrawal = amount / months;
-      for (let i = 0; i < months; i++) {
-        balance = balance * (1 + r) - withdrawal;
+      let withdrawn = 0;
+      let balances = [];
+
+      for (let i = 1; i <= m; i++) {
+        balance = balance * (1 + r) - w;
+        if (balance <= 0) {
+          withdrawn += Math.max(0, w + balance);
+          balance = 0;
+          document.getElementById('swpAlert').style.display = 'block';
+          document.getElementById('swpAlert').innerText = `⚠️ Portfolio exhausted in ${(i/12).toFixed(1)} years`;
+          break;
+        }
+        withdrawn += w;
+        balances.push(balance);
       }
-      finalValue = balance > 0 ? balance : 0;
-    }
 
-    if (type === 'liquid') {
       invested = amount;
-      const dailyRate = rate / 365;
-      finalValue = amount * Math.pow(1 + dailyRate, duration);
+      finalValue = balance;
+      gain = withdrawn;
+      drawLine(balances);
     }
 
-    const gain = finalValue - invested;
+    if (selectedType === 'liquid') {
+      invested = amount;
+      finalValue = amount + (amount * rate * duration) / 365;
+      gain = finalValue - invested;
+    }
 
     document.getElementById('invested').innerText = '₹' + invested.toFixed(0);
     document.getElementById('gain').innerText = '₹' + gain.toFixed(0);
     document.getElementById('final').innerText = '₹' + finalValue.toFixed(0);
 
-    drawChart(invested, finalValue);
+    if (selectedType !== 'swp') drawBar(invested, finalValue);
   }
 
-  function drawSWPChart(balances) {
-    const ctx = document.getElementById('chart');
+  function drawBar(a, b) {
     if (chart) chart.destroy();
-    chart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: balances.map((_, i) => i + 1),
-        datasets: [{
-          label: 'Portfolio Balance',
-          data: balances,
-          fill: false
-        }]
-      }
+    chart = new Chart(document.getElementById('chart'), {
+      type: 'bar',
+      data: { labels: ['Invested', 'Final Value'], datasets: [{ data: [a, b] }] }
     });
   }
 
-  function drawChart(invested, finalValue) {
-    const ctx = document.getElementById('chart');
+  function drawLine(data) {
     if (chart) chart.destroy();
-    chart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: ['Invested', 'Final Value'],
-        datasets: [{
-          data: [invested, finalValue]
-        }]
-      }
+    chart = new Chart(document.getElementById('chart'), {
+      type: 'line',
+      data: { labels: data.map((_, i) => i + 1), datasets: [{ label: 'Balance', data }] }
     });
   }
 </script>
