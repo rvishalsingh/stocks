@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mutual Fund Calculator | Presented by Vishal Singh</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f4f6f8;
+      color: #222;
+    }
+    header {
+      background: #0d6efd;
+      color: #fff;
+      padding: 15px;
+      text-align: center;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
+    .card {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 10px;
+    }
+    select, input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      background: #0d6efd;
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+    button:hover {
+      background: #084298;
+    }
+    .results {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .result-box {
+      background: #f1f5ff;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    canvas {
+      margin-top: 20px;
+    }
+    footer {
+      text-align: center;
+      font-size: 14px;
+      padding: 10px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h2>Mutual Fund Return Calculator</h2>
+  <p>Presented by Vishal Singh</p>
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <label>Choose Calculator</label>
+    <select id="type" onchange="changeType()">
+      <option value="sip">SIP</option>
+      <option value="lumpsum">Lumpsum</option>
+      <option value="swp">SWP</option>
+      <option value="liquid">Liquid Fund</option>
+    </select>
+
+    <label id="amountLabel">Investment Amount (₹)</label>
+    <input type="number" id="amount" value="500000" />
+
+    <div id="swpWithdrawal" style="display:none;">
+      <label>Withdrawal Per Month (₹)</label>
+      <input type="number" id="withdrawal" value="10000" />
+    </div>
+
+    <label id="durationLabel">Duration (Years)</label>
+    <input type="number" id="duration" value="10" />
+
+    <label>Expected Return (% per annum)</label>
+    <input type="number" id="rate" value="12" />
+
+    <button onclick="calculate()">Calculate</button>
+  </div>
+
+  <div class="card">
+    <div id="swpAlert" style="display:none;background:#ffe6e6;color:#b30000;padding:10px;border-radius:8px;margin-bottom:15px;text-align:center;font-weight:bold;"></div>
+    <div class="results">
+      <div class="result-box">
+        <h4>Total Invested</h4>
+        <p id="invested">₹0</p>
+      </div>
+      <div class="result-box">
+        <h4>Total Withdrawal</h4>
+        <p id="gain">₹0</p>
+      </div>
+      <div class="result-box">
+        <h4>Final Portfolio Value</h4>
+        <p id="final">₹0</p>
+      </div>
+    </div>
+    <canvas id="chart"></canvas>
+  </div>
+
+</div>
+
+<footer>
+  Mutual fund investments are subject to market risks. Returns are not guaranteed.
+</footer>
+
+<script>
+  let chart;
+
+  function changeType() {
+    const type = document.getElementById('type').value;
+    const label = document.getElementById('durationLabel');
+    const swpBox = document.getElementById('swpWithdrawal');
+    const amountLabel = document.getElementById('amountLabel');
+
+    if (type === 'liquid') {
+      label.innerText = 'Duration (Days)';
+      swpBox.style.display = 'none';
+      amountLabel.innerText = 'Investment Amount (₹)';
+    } else if (type === 'swp') {
+      const months = duration * 12;
+      invested = amount;
+      const r = rate / 12;
+      const withdrawal = parseFloat(document.getElementById('withdrawal').value);
+      let balance = amount;
+      totalWithdrawn = 0;
+      let exhaustedMonth = null;
+      let balances = [];
+
+      for (let i = 1; i <= months; i++) {
+        balance = balance * (1 + r) - withdrawal;
+        if (balance <= 0) {
+          exhaustedMonth = i;
+          totalWithdrawn += Math.max(0, withdrawal + balance);
+          balance = 0;
+          balances.push(0);
+          break;
+        }
+        totalWithdrawn += withdrawal;
+        balances.push(balance);
+      }
+
+      finalValue = balance;
+      document.getElementById('invested').innerText = '₹' + invested.toFixed(0);
+      document.getElementById('gain').innerText = '₹' + totalWithdrawn.toFixed(0);
+      document.getElementById('final').innerText = '₹' + finalValue.toFixed(0);
+
+      const alertBox = document.getElementById('swpAlert');
+      if (exhaustedMonth) {
+        const years = (exhaustedMonth / 12).toFixed(1);
+        alertBox.style.display = 'block';
+        alertBox.innerText = '⚠️ Portfolio exhausted in ' + years + ' years';
+      } else {
+        alertBox.style.displ
+    }
+  }
+  }
+
+  function calculate() {
+    const type = document.getElementById('type').value;
+    const amount = parseFloat(document.getElementById('amount').value);
+    const duration = parseFloat(document.getElementById('duration').value);
+    const rate = parseFloat(document.getElementById('rate').value) / 100;
+
+    let invested = 0, finalValue = 0, totalWithdrawn = 0;
+
+    if (type === 'sip') {
+      const months = duration * 12;
+      invested = amount * months;
+      const r = rate / 12;
+      finalValue = amount * ((Math.pow(1 + r, months) - 1) / r) * (1 + r);
+    }
+
+    if (type === 'lumpsum') {
+      invested = amount;
+      finalValue = amount * Math.pow(1 + rate, duration);
+    }
+
+    if (type === 'swp') {
+      const months = duration * 12;
+      invested = amount;
+      const r = rate / 12;
+      let balance = amount;
+      let withdrawal = amount / months;
+      for (let i = 0; i < months; i++) {
+        balance = balance * (1 + r) - withdrawal;
+      }
+      finalValue = balance > 0 ? balance : 0;
+    }
+
+    if (type === 'liquid') {
+      invested = amount;
+      const dailyRate = rate / 365;
+      finalValue = amount * Math.pow(1 + dailyRate, duration);
+    }
+
+    const gain = finalValue - invested;
+
+    document.getElementById('invested').innerText = '₹' + invested.toFixed(0);
+    document.getElementById('gain').innerText = '₹' + gain.toFixed(0);
+    document.getElementById('final').innerText = '₹' + finalValue.toFixed(0);
+
+    drawChart(invested, finalValue);
+  }
+
+  function drawSWPChart(balances) {
+    const ctx = document.getElementById('chart');
+    if (chart) chart.destroy();
+    chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: balances.map((_, i) => i + 1),
+        datasets: [{
+          label: 'Portfolio Balance',
+          data: balances,
+          fill: false
+        }]
+      }
+    });
+  }
+
+  function drawChart(invested, finalValue) {
+    const ctx = document.getElementById('chart');
+    if (chart) chart.destroy();
+    chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Invested', 'Final Value'],
+        datasets: [{
+          data: [invested, finalValue]
+        }]
+      }
+    });
+  }
+</script>
+
+</body>
+</html>
