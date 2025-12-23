@@ -102,10 +102,18 @@ function updateResult(id,value){
 
 // ===== Select Calculator =====
 function selectCalc(type){
-  selectedType=type;
-  document.querySelectorAll('.calc-card').forEach(c=>c.classList.remove('active'));
-  document.querySelector(`.calc-card[data-type="${type}"]`).classList.add('active');
+  selectedType = type;
+
+  document.querySelectorAll('.calc-card')
+    .forEach(c => c.classList.remove('active'));
+
+  document.querySelector(`.calc-card[data-type="${type}"]`)
+    .classList.add('active');
+
   renderInputs();
+
+  // ⬇️ AUTO SCROLL TO INPUT SECTION (MOBILE FRIENDLY)
+  setTimeout(scrollToInputs, 100);
 }
 
 // ===== Render Dynamic Inputs =====
@@ -334,6 +342,16 @@ function calcEMI(){
 
 // ===== Initial Render =====
 renderInputs();
+
+function scrollToInputs() {
+  const el = document.getElementById('dynamicCard');
+  if (!el) return;
+
+  el.scrollIntoView({
+    behavior: 'smooth',
+    block: 'start'
+  });
+}
 </script>
 
 </body>
