@@ -137,7 +137,7 @@ function renderInputs(){
       <div id="swpDiv" style="display:${selectedType==='swp'?'block':'none'};">
         <label>Withdrawal Per Month (₹)</label><input type="number" id="withdrawal" value="10000">
       </div>
-      <label id="durationLabel">Duration (Years)</label><input type="number" id="duration" value="10">
+      <label id="durationLabel">Duration (Years/Days)</label><input type="number" id="duration" value="10">
       <label>Expected Return (% p.a.)</label><input type="number" id="rate" value="12">
       <button onclick="calculateMF()">Calculate</button>
       <div id="swpAlert" style="display:none;background:#ffe6e6;color:#b30000;padding:12px;border-radius:10px;margin-top:10px;font-weight:bold;text-align:center;"></div>
@@ -356,3 +356,4 @@ function scrollToInputs() {
 
 </body>
 </html>
+
